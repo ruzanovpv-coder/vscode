@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>amaREnt — Премиальная аренда жилья</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --olive: #5C6635;
+            --olive-dark: #4A5228;
+            --honey: #C4924A;
+            --honey-hover: #D4A860;
+            --cream: #FAF6EB;
+            --brown: #5C3D2E;
+            --brown-dark: #3E2518;
+            --white: #FFFFFF;
+            --shadow-sm: 0 2px 8px rgba(92, 60, 46, 0.08);
+            --shadow-md: 0 4px 16px rgba(92, 60, 46, 0.14);
+            --shadow-lg: 0 8px 32px rgba(92, 60, 46, 0.20);
+            --font-display: 'Lora', serif;
+            --font-body: 'Nunito', sans-serif;
+            --container-max: 1200px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- Reset & Base --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--cream); 
+            color: var(--brown-dark); 
+            line-height: 1.6; 
+            overflow-x: hidden;
+        }
+        h1, h2, h3 { font-family: var(--font-display); font-weight: 600; }
+        a { text-decoration: none; color: inherit; transition: var(--transition-fast); }
+        ul { list-style: none; }
+        img { max-width: 100%; height: auto; display: block; }
+
+        .container { 
+            max-width: var(--container-max); 
+            margin: 0 auto; 
+            padding: 0 20px; 
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: var(--olive);
+            color: var(--white);
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-align: center;
+            transition: var(--transition-fast);
+        }
+        .btn:hover { background-color: var(--olive-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+        /* --- Header --- */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(250, 246, 235, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(92, 61, 46, 0.1);
+        }
+        .header-content {
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--brown); }
+        .logo span { color: var(--honey); }
+
+        /* Mobile Menu Logic (No JS) */
+        #menu-toggle { display: none; }
+        .burger {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+        .burger span {
+            width: 28px;
+            height: 2px;
+            background: var(--brown);
+            transition: var(--transition-slow);
+            transform-origin: center;
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 80%;
+            height: 100vh;
+            background: var(--cream);
+            padding: 100px 40px;
+            transform: translateX(100%);
+            visibility: hidden;
+            opacity: 0;
+            transition: var(--transition-slow);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            font-size: 1.2rem;
+        }
+
+        #menu-toggle:checked ~ .nav-menu { transform: translateX(0); visibility: visible; opacity: 1; }
+        #menu-toggle:checked ~ .burger span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        #menu-toggle:checked ~ .burger span:nth-child(2) { opacity: 0; transform: scale(0); }
+        #menu-toggle:checked ~ .burger span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+        /* --- Hero Section --- */
+        .hero {
+            position: relative;
+            padding: 120px 0 80px;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(rgba(250, 246, 235, 0.7), rgba(250, 246, 235, 0.7)), 
+                        url('https://images.unsplash.com/photo-1600607687940-4e524cb35097?auto=format&fit=crop&q=80&w=1920') center/cover no-repeat fixed;
+            overflow: hidden;
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 700px; }
+        .hero h1 { font-size: clamp(2.5rem, 8vw, 4rem); line-height: 1.1; margin-bottom: 24px; color: var(--brown-dark); }
+        .hero p { font-size: 1.25rem; margin-bottom: 40px; color: var(--brown); max-width: 500px; }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--honey) 0%, transparent 70%);
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: 1;
+            top: 10%;
+            right: -10%;
+            animation: pulse-blob 8s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse-blob {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.2) translate(-50px, 50px); }
+        }
+
+        .cta-pulse {
+            animation: pulse-btn 2s infinite;
+        }
+        @keyframes pulse-btn {
+            0% { box-shadow: 0 0 0 0 rgba(196, 146, 74, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(196, 146, 74, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(196, 146, 74, 0); }
+        }
+
+        /* --- Apartments Grid --- */
+        .section-padding { padding: 100px 0; }
+        .section-title { text-align: center; margin-bottom: 60px; }
+        .section-title h2 { font-size: 2.5rem; margin-bottom: 15px; }
+        .section-title .underline { width: 60px; height: 3px; background: var(--honey); margin: 0 auto; }
+
+        .apt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .apt-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-slow);
+            position: relative;
+        }
+        .apt-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); }
+        .apt-img { height: 240px; overflow: hidden; position: relative; }
+        .apt-img img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-slow); }
+        .apt-card:hover .apt-img img { transform: scale(1.1); }
+        .apt-info { padding: 24px; }
+        .apt-info h3 { margin-bottom: 10px; color: var(--brown); }
+        .apt-meta { display: flex; gap: 15px; font-size: 0.9rem; color: var(--olive); margin-bottom: 20px; font-weight: 600; }
+        
+        /* Modal Checkbox Logic */
+        .modal-toggle { display: none; }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(62, 37, 24, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-slow);
+        }
+        .modal-content {
+            background: var(--cream);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 12px;
+            transform: scale(0.9);
+            transition: var(--transition-slow);
+            position: relative;
+        }
+        .modal-close { position: absolute; top: 20px; right: 20px; cursor: pointer; font-size: 1.5rem; }
+        .modal-toggle:checked + .modal-overlay { opacity: 1; visibility: visible; }
+        .modal-toggle:checked + .modal-overlay .modal-content { transform: scale(1); }
+
+        /* --- Services --- */
+        .services { background-color: var(--brown-dark); color: var(--cream); }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+        .service-item svg { width: 48px; height: 48px; fill: var(--honey); margin-bottom: 20px; }
+        .service-item h3 { margin-bottom: 10px; font-family: var(--font-body); text-transform: uppercase; letter-spacing: 1px; font-size: 1rem; }
+
+        /* --- Contacts --- */
+        .contact-flex {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 60px;
+        }
+        .contact-info h2 { margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid rgba(92, 61, 46, 0.2);
+            border-radius: 4px;
+            font-family: inherit;
+            transition: var(--transition-fast);
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--honey);
+            box-shadow: 0 0 0 4px rgba(196, 146, 74, 0.1);
+        }
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        /* --- Footer --- */
+        footer { background: var(--cream); border-top: 1px solid rgba(92, 61, 46, 0.1); padding: 80px 0 40px; }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        .footer-logo { margin-bottom: 20px; display: block; }
+        .footer-links h4 { margin-bottom: 20px; color: var(--olive); }
+        .footer-links li { margin-bottom: 12px; }
+        .copyright { text-align: center; border-top: 1px solid rgba(92, 61, 46, 0.05); padding-top: 40px; font-size: 0.85rem; color: var(--brown); opacity: 0.7; }
+
+        /* --- Tablet & Desktop Overrides --- */
+        @media (min-width: 768px) {
+            .row-2 { grid-template-columns: 1fr 1fr; }
+            .nav-menu {
+                position: static;
+                width: auto;
+                height: auto;
+                background: transparent;
+                padding: 0;
+                transform: none;
+                visibility: visible;
+                opacity: 1;
+                flex-direction: row;
+                box-shadow: none;
+                align-items: center;
+                gap: 40px;
+                font-size: 0.95rem;
+                font-weight: 600;
+            }
+            .burger { display: none; }
+            .nav-link:hover { color: var(--honey); }
+            .btn-nav { padding: 10px 24px; }
+        }
+
+        @media (min-width: 1024px) {
+            .contact-flex { grid-template-columns: 1fr 1.5fr; }
+            .hero-content h1 { font-size: 4.5rem; }
+        }
+
+        /* --- Accessibility --- */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+        
+        :focus-visible { outline: 3px solid var(--honey); outline-offset: 4px; }
+    </style>
+</head>
+<body>
+
+    <header role="banner">
+        <div class="container header-content">
+            <a href="#" class="logo" aria-label="amaREnt Home">ama<span>RE</span>nt</a>
+            
+            <input type="checkbox" id="menu-toggle" aria-hidden="true">
+            <label for="menu-toggle" class="burger" aria-label="Открыть меню" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </label>
+
+            <nav class="nav-menu" role="navigation" aria-label="Главная навигация">
+                <a href="#apartments" class="nav-link">Апартаменты</a>
+                <a href="#services" class="nav-link">Сервис</a>
+                <a href="#contacts" class="nav-link">Контакты</a>
+                <a href="#contacts" class="btn btn-nav" style="background-color: var(--honey);">Забронировать</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="blob" aria-hidden="true"></div>
+            <div class="container hero-content">
+                <h1>Пространство для жизни в пути и подвале </h1>
+                <p>Эксклюзивные апартаменты в самом сердце города. Евродвушки, просторные трешки и роскошные пентхаусы для тех, кто ценит комфорт.</p>
+                <a href="#apartments" class="btn cta-pulse" aria-label="Перейти к выбору жилья">Выбрать жильё</a>
+            </div>
+        </section>
+
+        <section class="section-padding container" id="apartments">
+            <div class="section-title">
+                <h2>Наши апартаменты</h2>
+                <div class="underline"></div>
+            </div>
+
+            <div class="apt-grid">
+                <article class="apt-card">
+                    <div class="apt-img">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=600" alt="Евродвушка Scandi">
+                    </div>
+                    <div class="apt-info">
+                        <h3>Scandi Евродвушка</h3>
+                        <div class="apt-meta">
+                            <span>45 м²</span>
+                            <span>•</span>
+                            <span>2 гостя</span>
+                        </div>
+                        <p style="margin-bottom: 20px; font-size: 0.95rem; opacity: 0.8;">Минимализм и светлые тона. Идеально для бизнес-поездок.</p>
+                        <label for="modal-1" class="btn" style="width: 100%; font-size: 0.9rem;">Подробнее</label>
+                    </div>
+                </article>
+
+                <article class="apt-card">
+                    <div class="apt-img">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&q=80&w=600" alt="Семейная Двушка">
+                    </div>
+                    <div class="apt-info">
+                        <h3>Family Comfort</h3>
+                        <div class="apt-meta">
+                            <span>65 м²</span>
+                            <span>•</span>
+                            <span>4 гостя</span>
+                        </div>
+                        <p style="margin-bottom: 20px; font-size: 0.95rem; opacity: 0.8;">Просторная гостиная и уютная детская зона.</p>
+                        <label for="modal-1" class="btn" style="width: 100%; font-size: 0.9rem;">Подробнее</label>
+                    </div>
+                </article>
+
+                <article class="apt-card">
+                    <div class="apt-img">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&q=80&w=600" alt="Трёхкомнатные апартаменты">
+                    </div>
+                    <div class="apt-info">
+                        <h3>Grand Residence</h3>
+                        <div class="apt-meta">
+                            <span>90 м²</span>
+                            <span>•</span>
+                            <span>6 гостей</span>
+                        </div>
+                        <p style="margin-bottom: 20px; font-size: 0.95rem; opacity: 0.8;">Три раздельные комнаты и вид на исторический центр.</p>
+                        <label for="modal-1" class="btn" style="width: 100%; font-size: 0.9rem;">Подробнее</label>
+                    </div>
+                </article>
+
+                <article class="apt-card">
+                    <div class="apt-img">
+                        <img loading="lazy" src="https://images.unsplash.com/photo-1512918766671-ad65181584e7?auto=format&fit=crop&q=80&w=600" alt="Пентхаус">
+                    </div>
+                    <div class="apt-info">
+                        <h3>Sky Penthouse</h3>
+                        <div class="apt-meta">
+                            <span>140 м²</span>
+                            <span>•</span>
+                            <span>4 гостя</span>
+                        </div>
+                        <p style="margin-bottom: 20px; font-size: 0.95rem; opacity: 0.8;">Панорамные окна, терраса и премиальный дизайн.</p>
+                        <label for="modal-1" class="btn" style="width: 100%; font-size: 0.9rem;">Подробнее</label>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <input type="checkbox" id="modal-1" class="modal-toggle">
+        <div class="modal-overlay" role="dialog" aria-modal="true">
+            <div class="modal-content">
+                <label for="modal-1" class="modal-close" aria-label="Закрыть модальное окно">&times;</label>
+                <h3 style="margin-bottom: 20px;">Детали бронирования</h3>
+                <p style="margin-bottom: 20px;">Все наши апартаменты включают высокоскоростной Wi-Fi, белоснежное постельное белье, набор косметики и приветственный сет.</p>
+                <p>Для уточнения свободных дат, пожалуйста, заполните форму внизу страницы или свяжитесь с нами напрямую.</p>
+                <div style="margin-top: 30px;">
+                    <a href="#contacts" onclick="document.getElementById('modal-1').checked = false;" class="btn" style="width: 100%;">Перейти к форме</a>
+                </div>
+            </div>
+        </div>
+
+        <section class="section-padding services" id="services">
+            <div class="container">
+                <div class="section-title">
+                    <h2 style="color: var(--cream);">Премиальный сервис</h2>
+                    <div class="underline" style="background: var(--honey);"></div>
+                </div>
+                
+                <div class="services-grid">
+                    <div class="service-item">
+                        <svg viewBox="0 0 24 24"><path d="M12,21L15.6,16.2C14.6,15.45 13.35,15 12,15C10.65,15 9.4,15.45 8.4,16.2L12,21M12,3C7.95,3 4.21,4.34 1.2,6.6L3,9C5.5,7.12 8.62,6 12,6C15.38,6 18.5,7.12 21,9L22.8,6.6C19.79,4.34 16.05,3 12,3M12,9C9.3,9 6.81,9.89 4.8,11.4L6.6,13.8C8.1,12.67 9.97,12 12,12C14.03,12 15.9,12.67 17.4,13.8L19.2,11.4C17.19,9.89 14.7,9 12,9Z"/></svg>
+                        <h3>Smart Wi-Fi</h3>
+                        <p>Бесшовное покрытие по всей площади</p>
+                    </div>
+                    <div class="service-item">
+                        <svg viewBox="0 0 24 24"><path d="M7,14A2,2 0 0,1 5,12A2,2 0 0,1 7,10A2,2 0 0,1 9,12A2,2 0 0,1 7,14M12.65,10C11.83,7.67 9.61,6 7,6A6,6 0 0,0 1,12A6,6 0 0,0 7,18C9.61,18 11.83,16.33 12.65,14H17V18H21V14H23V10H12.65Z"/></svg>
+                        <h3>24/7 Доступ</h3>
+                        <p>Умные замки и бесконтактное заселение</p>
+                    </div>
+                    <div class="service-item">
+                        <svg viewBox="0 0 24 24"><path d="M18.92,6.01C18.72,5.42 18
